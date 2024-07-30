@@ -23,10 +23,12 @@ import("fmt"
 
 //7) func to handle requests from the frontend 
 
+//8) Create a key map 
 
 
 struct request {
 	District string `json:"District"`// will probably try rearranging it by state 
+	Population_number `json: Population_No` // (district should show the number via javascript ig should be dynamic? need a key value pair or smth)
 	Population_Simulated `json:"Population_Simulated"` uint
 	Email string `json: "email"` //regex added in the frontend itself 
 

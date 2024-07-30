@@ -2,6 +2,10 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 import os
+import warnings
+import pandas as pd
+warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def add_features(base_pop_df, state_name, district_name, district_source_files_path, agentid_offset=521000000000):
@@ -110,7 +114,7 @@ def add_features(base_pop_df, state_name, district_name, district_source_files_p
     gdf = gpd.read_file(district_geojson_fname)
 
     points_gdf = gpd.GeoDataFrame(base_pop_df, geometry=gpd.points_from_xy(base_pop_df.W_Lon, base_pop_df.W_Lat))
-    joined = gpd.sjoin(points_gdf, gdf, how='inner', op='within')
+    joined = gpd.sjoin(points_gdf, gdf, how='inner', predicate='within')
 
     base_pop_df['WorkPlace_AdminUnit'] = joined['name']
 
@@ -131,5 +135,20 @@ def add_features(base_pop_df, state_name, district_name, district_source_files_p
     'SchoolID', 'School_Lat', 'School_Lon', 'School_AdminUnit',
     'PublicPlaceID', 'PublicPlace_Lat', 'PublicPlace_Lon'     
             ]]
+    
+    # After all existing operations, add this code to generate metadata
+    metadata = {
+        "state_name": state_name,
+        "district_name": district_name,
+        "total_population": len(base_pop_df),
+        "age_distribution": base_pop_df['Age'].value_counts().to_dict(),
+        "gender_distribution": base_pop_df['SexLabel'].value_counts().to_dict(),
+        "total_households": base_pop_df['HHID'].nunique(),
+        "total_workplaces": base_pop_df['WorkPlaceID'].nunique(),
+        "total_schools": base_pop_df['SchoolID'].nunique(),
+        "essential_workers": int(base_pop_df['EssentialWorker'].sum()),
+        "public_transport_users": int(base_pop_df['UsesPublicTransport'].sum())
+    }
 
-    return base_pop_df
+
+    return base_pop_df,metadata #Return both dataframe and metadata 

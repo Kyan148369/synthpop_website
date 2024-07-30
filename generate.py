@@ -15,21 +15,33 @@ import gc
 
 from multiprocessing import Pool
 
+#Getting these warnings of the library on loop so coded it to ignore them 
+import warnings
+import pandas as pd
+warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 from expand_base_population import add_features
 
 parser = argparse.ArgumentParser()
 
 
 # The bool() function is not recommended as a type converter. All it does is convert empty strings to False and non-empty strings to True. This is usually not what is desired.
-
+#existing arguments
 parser.add_argument('--mean_wkplace_size', default=100)
-parser.add_argument('--n_proc', default=1)
+parser.add_argument('--n_proc', type=int, default=os.cpu_count(),help='No of processors to use')
 parser.add_argument('--debug', default=False)
 parser.add_argument('--subset', default="")
 parser.add_argument('--overwrite', default=True)
 
+
+parser.add_argument('--state_name', help='Name of the state to generate population for')
+parser.add_argument('--district', help='Name of the district to generate population for')
+parser.add_argument('--output_dir', help='Directory to save the output')
+
 arguments = parser.parse_args()
 
+#New arguemnts for specific state and district generation 
 mean_wkplace_size = int(arguments.mean_wkplace_size)
 n_proc = int(arguments.n_proc)
 DEBUG = arguments.debug=="True" or arguments.debug=="true" or arguments.debug=="TRUE" 
@@ -131,8 +143,8 @@ def generate_and_save_data(ihds_state_id, state_name, district_name, district_so
 
 		synthetic_population = generate_base_synthpop(ihds_state_id, district_source_files_path)
 
-		#  Expand base population
-		add_features(synthetic_population, state_name, district_name, district_source_files_path)
+		#  Expand base population and get metadata
+		synthetic_population, metadata = add_features(synthetic_population, state_name, district_name, district_source_files_path)
 		#  Asign workplace
 		
 		print("\n\n****************************************************************")
@@ -140,16 +152,16 @@ def generate_and_save_data(ihds_state_id, state_name, district_name, district_so
 		print("\n\n****************************************************************")
 
 		synthetic_population.to_csv(synthetic_population_output_filename, index=False)
-
+		metadata['file_path'] = synthetic_population_output_filename
 		del(synthetic_population)
 
 		gc.collect()
-		return True
+		return True,metadata
 
 	except Exception as e:
 		print(f"FatalException | STATE_ID: {ihds_state_id} | DISTRICT: {district_source_files_path} | ErrorMessage: {repr(e)}")
 		print(traceback.format_exc())
-		return False
+		return False, str(e)
 
 
 args_to_pass = []
@@ -185,20 +197,41 @@ if DEBUG and len(args_to_pass)!=0:
 	print("Synthetic population to be generated: %s" % args_to_pass)
 
 if __name__ == '__main__':
-	multiprocess_pool = Pool(n_proc)
 
-	output = multiprocess_pool.starmap(generate_and_save_data, args_to_pass)
-	multiprocess_pool.terminate()
+	if arguments.state_name and arguments.district:
+        # Generate for specific state and district
+		state_name = arguments.state_name
+		district_name = arguments.district
+		output_dir = arguments.output_dir or os.getcwd()
+		ihds_state_name = india_config['source_files_to_ihds_state_name_map'][state_name]
+		ihds_state_id = IHDS_II_STATE_NAME_TO_ID[ihds_state_name]
+		district_source_files_path = os.path.join(district_level_source_files_dir, state_name, district_name)
+		
+		success, result = generate_and_save_data(ihds_state_id, state_name, district_name, district_source_files_path)
+		if success:
+			output_file = os.path.join(output_dir, f"{state_name}_{district_name}_metadata.json")
+			with open(output_file, 'w') as f:
+				json.dump(result, f)
+				print(f"Metadata saved to {output_file}")
+		else:
+			print(f"Error: {result}")
+	else:
 
-							
+#ORIGINAL MULTI	PROCESS CODE
+		multiprocess_pool = Pool(n_proc)
+
+		output = multiprocess_pool.starmap(generate_and_save_data, args_to_pass)
+		multiprocess_pool.terminate()
+		failed_districts = [x[0] for x in zip(args_to_pass, output) if not x[1]]
+		if len(failed_districts) >0:
+			print("\n\n****************************************************************")
+			print("\n\nGenerating synthetic population failed for districts:")
+			for failed_district in failed_districts:
+				print(failed_districts)
+			print("****************************************************************\n\n")
+		if(DEBUG):
+			print("Started At :", start, "\nEnded At :", end, "\nWall Time :", end-start)
+
 	end = datetime.datetime.now()
-
-	failed_districts = [x[0] for x in zip(args_to_pass, output) if not x[1]]
-	if len(failed_districts) >0:
-		print("\n\n****************************************************************")
-		print("\n\nGenerating synthetic population failed for districts:")
-		for failed_district in failed_districts:
-			print(failed_districts)
-		print("****************************************************************\n\n")
 	if(DEBUG):
 		print("Started At :", start, "\nEnded At :", end, "\nWall Time :", end-start)
