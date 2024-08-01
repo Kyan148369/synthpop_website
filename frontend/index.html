@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthetic Population Generator</title>
+    <!--Adding a Favicon as logo-->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Added google font that provides roboto font , numbers represents the font weights to allow
+     us to use different styles of it throughout the website, display swap makes sure text remains visible
+     during loading-->
+    <link href="htpps://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        form { display: grid; gap: 10px; }
+        button { cursor: pointer; }
+        #result { margin-top: 20px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Synthetic Population Generator</h1>
+    <form id="requestForm">
+        <label for="District">District:</label>
+        <input type="text" id="District" name="District" required>
+        
+        <label for="Population_Simulated">Year:</label>
+        <input type="text" id="Population_Simulated" name="Population_Simulated" required>
+        
+        <label for="population">Population Range:</label>
+        <input type="text" id="population" name="population" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+<!-- Submit button -->
+        <button type="submit" class="btn btn-primary">Request Data</button>    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('requestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const requestData = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/request', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
