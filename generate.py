@@ -1,26 +1,28 @@
 import numpy as np
 import pandas as pd
-
+#importing libs from synthpop
 from synthpoppp.base_population import IPU
 from synthpoppp.helper_constants import *
 from synthpoppp.geographical_distributions import HLatHlongAgeAddition, JobsPlacesAddition
-
+#importing lib for multiple arguments
 import argparse
 import datetime
 import traceback
 
 import os
 import json
+#library for garbe collector 
 import gc
 
 from multiprocessing import Pool
 
 #Getting these warnings of the library on loop so coded it to ignore them 
+import sys
 import warnings
 import pandas as pd
 warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
-
+#
 from expand_base_population import add_features
 
 parser = argparse.ArgumentParser()
@@ -66,8 +68,9 @@ ihds_households_data = pd.read_csv(ihds_household_filename, sep='\t')
 
 india_config = json.loads(open("config.json").read())
 
-source_file_state_names = os.listdir("district_level_source_files")
-
+#in macos they end up storing .DS_Store and it was getting inputted in the list of states so removing it
+source_file_state_names = [name for name in os.listdir("district_level_source_files") if not name.startswith('.')]
+print(source_file_state_names)
 if(not subsetting):
 	subset = source_file_state_names
 
@@ -196,6 +199,7 @@ args_to_pass = sorted(args_to_pass, key=lambda x : x[1])
 if DEBUG and len(args_to_pass)!=0:
 	print("Synthetic population to be generated: %s" % args_to_pass)
 
+#basically if this is called directly instead of being used by a module
 if __name__ == '__main__':
 
 	if arguments.state_name and arguments.district:
@@ -203,6 +207,25 @@ if __name__ == '__main__':
 		state_name = arguments.state_name
 		district_name = arguments.district
 		output_dir = arguments.output_dir or os.getcwd()
+		if not state_name or not district_name:
+			print("Error both must be provided")
+			sys.exit(1)
+
+		if state_name not in source_file_state_names:
+			print("Not a valid state name")
+			sys.exit(1)
+
+
+		state_dir = os.path.join(district_level_source_files_dir, state_name)
+		if not os.path.isdir(state_dir):
+			print(f"Error: {state_name} is not a valid state name")
+			sys.exit(1)
+
+		district_dir = os.path.join(district_level_source_files_dir, state_name)
+		if not os.path.isdir(district_dir):
+			print(f"Error: {state_name} is not a valid state name")
+			sys.exit(1)
+
 		ihds_state_name = india_config['source_files_to_ihds_state_name_map'][state_name]
 		ihds_state_id = IHDS_II_STATE_NAME_TO_ID[ihds_state_name]
 		district_source_files_path = os.path.join(district_level_source_files_dir, state_name, district_name)

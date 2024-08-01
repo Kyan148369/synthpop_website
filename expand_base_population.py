@@ -46,7 +46,7 @@ def add_features(base_pop_df, state_name, district_name, district_source_files_p
     #         20-24	    0.3
     #         25-29	    0.2
     #         30-34	    0.1
-    #         35-40	    0.0
+    #         35-40	    0.1 # changed it to .1 
     #         41-59	    0.9
     #         60-99	    1.0
 
@@ -56,7 +56,7 @@ def add_features(base_pop_df, state_name, district_name, district_source_files_p
     base_pop_df.loc[(base_pop_df['Age'] >=20)  & (base_pop_df['Age'] <=24), 'Adherence_to_Intervention'] = 0.3
     base_pop_df.loc[(base_pop_df['Age'] >=25)  & (base_pop_df['Age'] <=29), 'Adherence_to_Intervention'] = 0.2
     base_pop_df.loc[(base_pop_df['Age'] >=30)  & (base_pop_df['Age'] <=34), 'Adherence_to_Intervention'] = 0.1
-    base_pop_df.loc[(base_pop_df['Age'] >=35)  & (base_pop_df['Age'] <=40), 'Adherence_to_Intervention'] = 0.0
+    base_pop_df.loc[(base_pop_df['Age'] >=35)  & (base_pop_df['Age'] <=40), 'Adherence_to_Intervention'] = 0.1
     base_pop_df.loc[(base_pop_df['Age'] >=41)  & (base_pop_df['Age'] <=59), 'Adherence_to_Intervention'] = 0.9
     base_pop_df.loc[(base_pop_df['Age'] >=60)  & (base_pop_df['Age'] <=99), 'Adherence_to_Intervention'] = 1.0
 
@@ -125,7 +125,7 @@ def add_features(base_pop_df, state_name, district_name, district_source_files_p
 
     # Save the df into the specified format
 
-    base_pop_df = base_pop_df[['AgentID', 'SexLabel', 'Age', 'Religion', 'Caste', 
+    base_pop_df = base_pop_df[['AgentID', 'SexLabel', 'Age', 'religion', 'Caste', 
     'StateLabel', 'District',
     'JobLabel', 'EssentialWorker',
     'AdminUnit_Name', 'AdminUnit_Lat', 'AdminUnit_Lon', 
