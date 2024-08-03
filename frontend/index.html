@@ -10,34 +10,219 @@
      us to use different styles of it throughout the website, display swap makes sure text remains visible
      during loading-->
     <link href="htpps://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!--adding bootstrap for styling-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        form { display: grid; gap: 10px; }
-        button { cursor: pointer; }
-        #result { margin-top: 20px; white-space: pre-wrap; }
+        /*defines colors and declared global CSS variables*/
+        :root{
+            --primary-color: #4A148C;
+            --accent-color: #4DB6AC;
+            --text-colour: #333;
+            --bg-color: #f5f5f5;
+        }
+        *{ /* removing default margin and padding from all elements and adding boxing size 
+            cause its more predictable */
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        } 
+        body {/* Line height 1.6 times font size*/
+             font-family: 'Roboto', sans-serif; 
+             line-height: 1.6;
+             color: var(--text-color);
+             background-color: var(--bg-color);
+        }
+        header{ /*spaces out header items and defines its other props , rem is CSS unit of 
+            measurement equivalent to font size of root element*/
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        /* Hamburger lines here */
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 2px 0;
+        }
+        /* removes bullet points from nav list which is the unordered list inside the nav */
+        nav ul {
+            list-style-type: none;
+            display: flex;
+
+        } /* list items in unordered list */
+        nav ul li {
+            margin-left: 1rem;
+        }
+        /* anchor tags(links) inside those list items */
+        nav ul li a{
+            color: white;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 800 px;
+            margin: 2 rem auto;
+            padding: 2 rem;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+        /* inputting data*/
+        form {
+             display: grid;
+              gap: 1rem; 
+        }
+        label
+            {
+            font-weight: bold;
+        }
+        select,input, button {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        /* defines for each button*/
+        button { 
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--bg-color) 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049 ;
+        }
+        #result {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        /*Styling for screens smaller than 768 px */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            nav {
+                display: none;
+                width: 100%;
+            }
+            nav.show {
+                display: block;
+            }
+            nav ul {
+                flex-direction: colum;
+            }
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+        }
     </style>
 </head>
 <body>
+    <header>
+    <div class="logo"> SynthPop</div>
+    <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <nav>
+        <ul>
+            <li<a href="#home">Home</a>
+            <li><a href="about"></a></li>
+        </ul>
+    </nav>
+    </header>
+        
+
+    <div class="container">
     <h1>Synthetic Population Generator</h1>
     <form id="requestForm">
-        <label for="District">District:</label>
-        <input type="text" id="District" name="District" required>
-        
-        <label for="Population_Simulated">Year:</label>
-        <input type="text" id="Population_Simulated" name="Population_Simulated" required>
-        
-        <label for="population">Population Range:</label>
-        <input type="text" id="population" name="population" required>
-        
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        
+        <div class=" mb-3">
+        <label for="State" class="form-label">State:</label>
+        <select id="state" name="state" class="form-select" required>
+            <option value="maharashtra"> Maharashtra</option>
+            <option value="gujarat"> Gujarat</option>
+            <option value="karnataka">Karnataka</option>
+        </select>
+    </div>
+    <div class ="mb-3">
+        <label for="District" class="form-label"> District:</label>
+        <select id="District" name="district" class="form-select" required>
+            <option value=""> Select District </option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="population" class="form-label">Population Range:</label>
+        <input type="text" id="population" name="population" class="form-control" required placeholder="e.g., 100000-500000">
+    </div>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <input type="email" id="email" name="email" class="form-control" required>
+    </div>
 <!-- Submit button -->
-        <button type="submit" class="btn btn-primary">Request Data</button>    </form>
+        <button type="submit" class="btn btn-primary">Generate Populatiion</button>   
+     </form>
 
-    <div id="result"></div>
-
+    <div id="result" class="mt-4"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        //Hamburger menu functionality
+        document.querySelector('.hamburger').addEventListener('click', function(){
+            document.querySelector('nav').classList.toggle('show');    
+        });
+
+
+    // States and their corresponding districts
+    const stateDistricts = {
+        'maharashtra': ['Pune'],
+        'gujarat': ['Surat'],
+        'karnataka': ['Bengaluru']
+    };
+
+    // Function to populate district dropdown
+    function populateDistricts() {
+    const selectedState = stateSelect.value;
+    const districtSelect = document.getElementById('District'); // Note the capital 'D' to match your HTML
+    
+    // Clear existing options
+    districtSelect.innerHTML = '<option value="">Select District</option>';
+    
+    // Populate districts for the selected state
+    if (stateDistricts[selectedState]) {
+        stateDistricts[selectedState].forEach(district => {
+            const option = document.createElement('option');
+            option.value = district.toLowerCase().replace(/\s+/g, '-');
+            option.textContent = district;
+            districtSelect.appendChild(option);
+        });
+    }
+}
+
+    // Add event listener to state dropdown
+    stateSelect.addEventListener('change', populateDistricts);
+
+    // Initial population of districts
+    populateDistricts();
         document.getElementById('requestForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -57,7 +242,7 @@
                 const data = await response.json();
                 document.getElementById('result').textContent = JSON.stringify(data, null, 2);
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error:', error);~
                 document.getElementById('result').textContent = `Error: ${error.message}`;
             }
         });
