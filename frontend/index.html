@@ -47,13 +47,7 @@
             font-size: 1.3rem;
             font-weight: bold;
         }
-        /* Hamburger lines here */
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background-color: white;
-            margin: 2px 0;
-        }
+        
         /* removes bullet points from nav list which is the unordered list inside the nav */
         nav ul {
             list-style-type: none;
@@ -75,7 +69,6 @@
             background-color: var(--bg-color);
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding:
         }
 
         
@@ -212,10 +205,12 @@
         'karnataka': ['Bengaluru']
     };
 
+    const stateSelect = document.getElementById('state');
+    const districtSelect = document.getElementById('District'); 
+
     // Function to populate district dropdown
-    function populateDistricts() {
+function populateDistricts() {
     const selectedState = stateSelect.value;
-    const districtSelect = document.getElementById('District'); // Note the capital 'D' to match your HTML
     
     // Clear existing options
     districtSelect.innerHTML = '<option value="">Select District</option>';
@@ -231,18 +226,18 @@
     }
 }
 
-    // Add event listener to state dropdown
-    stateSelect.addEventListener('change', populateDistricts);
+// Add event listener to state dropdown
+stateSelect.addEventListener('change', populateDistricts);
 
-    // Initial population of districts
-    populateDistricts();
+// Initial population of districts
+populateDistricts();
         document.getElementById('requestForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const requestData = Object.fromEntries(formData);
             
             try {
-                const response = await fetch('http://localhost:8080/api/request', {
+                const response = await fetch('/api/request', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(requestData)
@@ -255,7 +250,7 @@
                 const data = await response.json();
                 document.getElementById('result').textContent = JSON.stringify(data, null, 2);
             } catch (error) {
-                console.error('Error:', error);~
+                console.error('Error:', error);
                 document.getElementById('result').textContent = `Error: ${error.message}`;
             }
         });
